@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>The-K 온오프라인 이벤트</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Inter:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css" />
+
+<style>
+  :root{
+    --black:#000000;
+    --white:#ffffff;
+    --gray-text:#b3b3b3;
+    --gray-bg:#f5f5f5;
+    --gallery-bg:#1a1a1a;
+    --header-h: 99px; /* 40 top offset + 24 logo row + 11 gap-ish + 35 menu row (visual) */
+  }
+
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:#2b2b2b;
+    font-family:'Pretendard','Noto Sans KR',sans-serif;
+    color:#000;
+    display:flex;
+    justify-content:center;
+  }
+  img{ display:block; max-width:100%; }
+  button{ font-family:inherit; border:none; background:none; cursor:pointer; -webkit-appearance:none; }
+
+  .viewport{
+    position:relative;
+    width:390px;
+    max-width:100vw;
+    min-height:100vh;
+    background:#fff;
+    overflow-x:hidden;
+    box-shadow:0 0 40px rgba(0,0,0,.35);
+  }
+
+  /* ===================== HEADER ===================== */
+  .top-header{
+    position:fixed;
+    top:0; left:50%;
+    transform:translate(-50%,0);
+    width:390px;
+    max-width:100vw;
+    z-index:60;
+    padding:40px 20px 16px;
+    pointer-events:none;
+  }
+  .top-header *{ pointer-events:auto; }
+  .header-row{
+    display:flex; align-items:center; justify-content:space-between;
+    height:24px; margin-bottom:24px;
+  }
+  .logo img{ height:24px; width:auto; }
+  .hamburger{ width:24px; height:24px; display:flex; align-items:center; justify-content:center; }
+  .hamburger img{ width:24px; height:24px; }
+
+  .tab-menu{ display:flex; gap:4px; width:100%; }
+  .tab{
+    flex:1 0 0;
+    border:1px solid #000;
+    background:#fff;
+    color:#000;
+    font-weight:500;
+    font-size:14px;
+    letter-spacing:-0.14px;
+    padding:8px 6px;
+    text-align:center;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    transition:background-color .2s ease, color .2s ease;
+  }
+  .tab.active{ background:#000; color:#fff; }
+
+  /* ===================== CONTACT PILL ===================== */
+  .contact-pill{
+    position:fixed;
+    left:50%;
+    bottom:24px;
+    transform:translateX(-50%);
+    z-index:70;
+    display:flex; align-items:center; gap:4px;
+    background:#000; color:#fff;
+    padding:10px 17px 10px 24px;
+    border-radius:999px;
+    font-size:18px; font-weight:500; letter-spacing:-0.18px;
+    text-decoration:none;
+  }
+  .contact-pill img{ width:24px; height:24px; }
+
+  /* ===================== SCROLL CONTENT ===================== */
+  .scroll-content{ position:relative; z-index:1; }
+
+  .intro{ width:100%; }
+  .hero{ position:relative; width:390px; max-width:100%; height:440px; overflow:hidden; background:#000; }
+  .hero-img{
+    position:absolute; top:0; left:0;
+    width:100%; height:100%; max-width:none;
+    object-fit:cover;
+  }
+  .hero-gradient{
+    position:absolute; left:0; bottom:0; width:100%; height:317px;
+    background:linear-gradient(to bottom, rgba(0,0,0,0) 0%, #000 100%);
+  }
+  .headline{ position:absolute; left:24px; top:290px; width:342px; color:#fff; }
+  .headline .eyebrow{ margin:0 0 8px; font-weight:700; font-size:10px; letter-spacing:-0.2px; color:var(--gray-text); }
+  .headline h1{ margin:0 0 8px; font-weight:900; font-size:40px; line-height:42px; letter-spacing:-0.8px; }
+  .headline .sub{ margin:0; font-weight:500; font-size:12px; letter-spacing:-0.24px; color:var(--gray-text); }
+
+  .con{ background:#fff; padding:20px; }
+  .info-stack{ display:flex; flex-direction:column; gap:60px; width:100%; }
+
+  .project-desc{ margin:0; font-size:12px; font-weight:500; line-height:1.1; }
+  .info-list{ display:flex; flex-direction:column; gap:7px; margin-top:20px; font-size:12px; }
+  .info-list .row{ display:flex; }
+  .info-list .row span:first-child{ font-weight:700; width:54px; flex-shrink:0; }
+  .info-list .row span:last-child{ font-weight:500; }
+  .site-link{ display:flex; align-items:center; gap:6px; margin-top:20px; font-weight:900; font-size:12px; }
+  .site-link img{ width:6px; height:6px; }
+
+  .section-block{ margin-top:60px; }
+  .section-title{ display:flex; align-items:center; gap:8px; white-space:nowrap; }
+  .section-title h2{ margin:0; font-weight:900; font-size:24px; letter-spacing:-0.48px; }
+  .section-title .meta{ font-size:12px; font-weight:500; display:flex; gap:2px; }
+
+  .filter-chips{ display:flex; gap:6px; margin:12px 0; }
+  .chip{ border:1px solid #000; background:#fff; color:#000; font-size:10px; font-weight:500; letter-spacing:-0.1px; padding:4px 8px; }
+  .chip.active{ background:#000; color:#fff; }
+
+  .preview-grid{ display:flex; flex-direction:column; gap:6px; }
+  .preview-grid .tile-full{ width:100%; aspect-ratio:350/172; object-fit:cover; border-radius:10px; background:var(--gray-bg); }
+  .preview-grid .tile-row{ display:flex; gap:6px; }
+  .preview-grid .tile-row img{ width:calc(50% - 3px); aspect-ratio:1/1; object-fit:cover; border-radius:10px; background:var(--gray-bg); }
+
+  .btn-black{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    width:100%; background:#000; color:#fff;
+    border-radius:10px; padding:18px 0; margin-top:6px;
+    font-size:18px; font-weight:500; letter-spacing:-0.18px;
+  }
+  .icon-grid{ width:14px; height:14px; display:grid; grid-template-columns:6px 6px; grid-template-rows:6px 6px; gap:2px; }
+  .icon-grid span{ background:#fff; border-radius:1.5px; }
+
+  .stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .stat{ background:var(--gray-bg); border-radius:10px; padding:14px; display:flex; flex-direction:column; gap:12px; }
+  .stat span{ font-size:12px; font-weight:500; }
+  .stat strong{ font-size:20px; font-weight:700; letter-spacing:-0.4px; }
+
+  .process-box{ background:var(--gray-bg); border-radius:10px; padding:14px; margin-top:6px; }
+  .process-box > span{ font-size:12px; font-weight:500; display:block; margin-bottom:40px; }
+  .timeline{ position:relative; display:flex; justify-content:space-between; }
+  .timeline-line{ position:absolute; left:20px; right:20px; top:6px; width:auto; height:1px; }
+  .step{ position:relative; display:flex; flex-direction:column; align-items:center; gap:8px; z-index:1; }
+  .step img.dot{ width:12px; height:12px; }
+  .step p{ margin:0; font-size:8px; font-weight:500; text-align:center; line-height:1.1; }
+
+  .related-section{ background:#fff; padding:40px 20px 120px; display:flex; flex-direction:column; gap:24px; }
+  .related-head{ display:flex; align-items:center; justify-content:space-between; }
+  .related-head h3{ margin:0; font-family:'Noto Sans KR',sans-serif; font-weight:900; font-size:24px; letter-spacing:-1px; }
+  .show-all{ display:flex; align-items:center; gap:4px; background:var(--gray-bg); border-radius:999px; padding:5px 8px 5px 18px; font-size:14px; font-weight:500; letter-spacing:-0.14px; }
+  .show-all img{ width:24px; height:24px; }
+  .related-card{ display:flex; flex-direction:column; gap:14px; text-decoration:none; color:#000; }
+  .related-card img{ width:100%; aspect-ratio:350/196; object-fit:cover; border-radius:6px; background:var(--gray-bg); }
+  .related-card .cat{ margin:0; font-size:14px; font-weight:500; letter-spacing:-0.28px; color:var(--gray-text); }
+  .related-card .title{ margin:0; font-family:'Noto Sans KR',sans-serif; font-weight:900; font-size:20px; letter-spacing:-1px; }
+
+  .contact-section{ background:#000; color:#fff; padding:40px 20px 20px; display:flex; flex-direction:column; gap:80px; }
+  .talk-row{ display:flex; align-items:center; gap:4px; }
+  .talk-row h2{ margin:0; font-weight:900; font-size:36px; letter-spacing:-0.72px; }
+  .talk-row img{ width:50px; height:50px; }
+  .email{ margin:2px 0 0; font-weight:600; font-size:20px; }
+  .note{ margin:4px 0 0; font-weight:400; font-size:12px; }
+  .contact-rows{ display:flex; flex-direction:column; gap:4px; font-size:12px; color:var(--gray-text); }
+  .contact-rows .row{ display:flex; gap:4px; }
+  .contact-rows .row span:first-child{ width:26px; flex-shrink:0; }
+  .footer-logo{ margin-top:20px; width:350px; max-width:100%; height:auto; }
+
+  /* ===================== GALLERY OVERLAY ===================== */
+  .gallery-overlay{
+    position:fixed; inset:0; z-index:200;
+    width:390px; max-width:100vw; height:100vh;
+    left:50%; transform:translateX(-50%);
+    background:#000; color:#fff;
+    display:flex; flex-direction:column;
+    visibility:hidden; opacity:0;
+  }
+  .gallery-header{ display:flex; align-items:flex-start; gap:71px; padding:40px 20px 0; }
+  .gallery-back{ width:24px; height:24px; flex-shrink:0; }
+  .gallery-back img{ width:24px; height:24px; }
+  .gallery-nav-info{ display:flex; flex-direction:column; align-items:center; gap:20px; width:160px; }
+  .gallery-count{ display:flex; gap:3px; font-size:18px; font-weight:500; letter-spacing:-1px; }
+  .gallery-count #galleryCur{ color:#fff; }
+  .gallery-count span:nth-child(2){ color:#fff; }
+  .gallery-count #galleryTotal{ color:var(--gray-text); }
+  .gallery-filter{ display:flex; align-items:center; gap:4px; background:var(--gallery-bg); color:#fff; border-radius:999px; padding:5px 8px 5px 18px; font-size:14px; font-weight:500; letter-spacing:-0.14px; }
+  .gallery-filter img{ width:24px; height:24px; }
+
+  .gallery-stage{ flex:1; display:flex; align-items:center; justify-content:center; padding:16px 20px 0; min-height:0; }
+  .gallery-stage-inner{ position:relative; width:100%; max-width:350px; }
+  .gallery-img{ width:100%; height:auto; border-radius:10px; display:block; }
+  .gallery-expand{ position:absolute; right:10px; bottom:10px; width:24px; height:24px; border-radius:999px; background:rgba(0,0,0,.3); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .gallery-expand.is-expand{ background:#000; }
+  .gallery-expand.is-expand img{ width:20px; height:20px; }
+  .gallery-expand img{ width:24px; height:24px; }
+
+  .gallery-controls{ display:flex; gap:16px; align-items:center; justify-content:center; padding:16px 20px 40px; }
+  .nav-btn{
+    width:42px; height:42px; border-radius:999px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--gallery-bg);
+  }
+  .nav-btn .chevron{ width:22px; height:22px; display:block; }
+  .nav-btn.is-active{ background:#fff; }
+  .nav-btn.is-disabled{ pointer-events:none; }
+
+  .page{ display:none; }
+  .page.is-active{ display:block; }
+  .related-card.is-link{ cursor:pointer; }
+
+  /* ===================== LANDSCAPE VIDEO FULLVIEW ===================== */
+  .fullview-overlay{
+    position:fixed; inset:0; z-index:300;
+    background:#000;
+    display:flex; align-items:center; justify-content:center;
+    visibility:hidden; opacity:0;
+  }
+  .fullview-stage{ position:relative; width:100%; max-width:600px; aspect-ratio:812/390; transform-origin:center center; }
+  .fullview-stage img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .fullview-back{ position:absolute; left:44.33%; top:10.26%; width:24px; height:24px; }
+  .fullview-back img{ width:24px; height:24px; }
+
+  @media (max-width:420px){
+    .viewport, .top-header, .gallery-overlay{ width:100vw; }
+  }
+</style>
+</head>
+<body>
+
+<div class="viewport">
+
+  <!-- ===== Fixed header ===== -->
+  <header class="top-header" id="topHeader">
+    <div class="header-row">
+      <span class="logo"><img src="assets/common/logo-black.png" alt="NPLEY" /></span>
+      <button class="hamburger" aria-label="메뉴"><img src="assets/common/icon-hamburger.svg" alt="" /></button>
+    </div>
+    <nav class="tab-menu" id="tabMenu">
+      <button class="tab active" data-target="intro">인트로</button>
+      <button class="tab" data-target="overview">한눈에 보기</button>
+      <button class="tab" data-target="detail">상세 정보</button>
+      <button class="tab" data-target="assetSection">제작 에셋</button>
+    </nav>
+  </header>
+
+  <!-- ===== Fixed contact pill ===== -->
+  <button class="contact-pill" id="contactPill" type="button">
+    Contact <img src="assets/common/icon-arrow-right-alt-sm.svg" alt="" />
+  </button>
+
+  <main class="scroll-content page is-active" data-page="main">
+
+    <!-- INTRO -->
+    <section class="intro" data-section="intro">
+      <div class="hero">
+        <img class="hero-img" src="assets/main/hero.png" alt="" />
+        <div class="hero-gradient"></div>
+        <div class="headline">
+          <p class="eyebrow">이벤트</p>
+          <h1>The-K<br />온오프라인 이벤트</h1>
+          <p class="sub">ON &amp; OFFLINE EVENT PROMOTION</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- INFO + OVERVIEW + DETAIL + ASSET -->
+    <div class="con">
+      <div class="info-stack">
+
+        <div>
+          <p class="project-desc">프로젝트 관련 설명 최대 4줄 작성 가능합니다. 프로젝트 관련 설명 최대 4줄 작성 가능합니다. 프로젝트 관련 설명 최대 4줄 작성 가능합니다. 프로젝트 관련 설명 최대 4줄 작성 가능합니다. 프로젝트 관련 설명 최대 4줄 작성 가능합니다. 프로젝트 관련 설명 최대 4줄 작성 가능합니다. </p>
+          <div class="info-list">
+            <div class="row"><span>고객사</span><span>The-K</span></div>
+            <div class="row"><span>런칭일</span><span>2026년 00월</span></div>
+            <div class="row"><span>포지션</span><span>온오프라인 이벤트 프로모션</span></div>
+          </div>
+          <div class="site-link"><span>www.관련 사이트.kr</span><img src="assets/common/icon-link.svg" alt="" /></div>
+        </div>
+
+        <div class="section-block" data-section="overview">
+          <div class="section-title">
+            <h2>한눈에 보기</h2>
+            <span class="meta"><span>사진 3</span><b>·</b><span>영상 10</span></span>
+          </div>
+          <div class="filter-chips" id="overviewChips">
+            <button class="chip active" data-filter="all">전체</button>
+            <button class="chip" data-filter="online">온라인</button>
+            <button class="chip" data-filter="offline">오프라인</button>
+          </div>
+          <div id="overviewGrid">
+            <div class="preview-grid" data-panel="all">
+              <img class="tile-full" src="assets/main/preview-1.png" alt="" />
+              <div class="tile-row">
+                <img src="assets/main/preview-2.png" alt="" />
+                <img src="assets/main/preview-3.png" alt="" />
+              </div>
+              <div class="tile-row">
+                <img src="assets/main/preview-4.png" alt="" />
+                <img src="assets/main/preview-5.png" alt="" />
+              </div>
+            </div>
+            <div class="preview-grid" data-panel="online" style="display:none">
+              <img class="tile-full" src="assets/main/preview-online-1.png" alt="" />
+              <div class="tile-row">
+                <img src="assets/main/preview-2.png" alt="" />
+                <img src="assets/main/preview-3.png" alt="" />
+              </div>
+            </div>
+            <div class="preview-grid" data-panel="offline" style="display:none">
+              <img class="tile-full" src="assets/main/preview-1.png" alt="" />
+              <img class="tile-full" src="assets/main/preview-offline-2.png" alt="" />
+            </div>
+          </div>
+          <button class="btn-black" id="viewAllWork">
+            <span class="icon-grid"><span></span><span></span><span></span><span></span></span>
+            View All Work
+          </button>
+        </div>
+
+        <div class="section-block" data-section="detail">
+          <h2 style="margin:0 0 12px;font-weight:900;font-size:24px;letter-spacing:-0.48px;">상세 정보</h2>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div class="stat-grid">
+              <div class="stat"><span>제작 기간</span><strong>26.01 ~ 진행중</strong></div>
+              <div class="stat"><span>디자인 컨셉</span><strong>시즌, 기관 이벤트</strong></div>
+            </div>
+            <div class="stat-grid">
+              <div class="stat"><span>제작 에셋 수</span><strong>16+</strong></div>
+              <div class="stat"><span>제작 작업물 수</span><strong>10+</strong></div>
+            </div>
+            <div class="process-box">
+              <span>제작 프로세스</span>
+              <div class="timeline">
+                <img class="timeline-line" src="assets/common/icon-timeline.svg" alt="" />
+                <div class="step"><img class="dot" src="assets/common/icon-dot.svg" alt="" /><p>이벤트 기획<br />(약 0일)</p></div>
+                <div class="step"><img class="dot" src="assets/common/icon-dot.svg" alt="" /><p>컨셉 테스트<br />(약 0일)</p></div>
+                <div class="step"><img class="dot" src="assets/common/icon-dot.svg" alt="" /><p>디자인 진행<br />(약 0일)</p></div>
+                <div class="step"><img class="dot" src="assets/common/icon-dot.svg" alt="" /><p>개발 및 배포<br />(약 0일)</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-block" data-section="assetSection">
+          <div class="section-title">
+            <h2>제작 에셋</h2>
+            <span class="meta"><span>총 16</span></span>
+          </div>
+          <div class="filter-chips">
+            <button class="chip active">전체</button>
+            <button class="chip">캐릭터</button>
+            <button class="chip">배경</button>
+            <button class="chip">아이콘</button>
+          </div>
+          <div class="preview-grid">
+            <img class="tile-full" src="assets/main/asset-preview-1.png" alt="" />
+            <div class="tile-row">
+              <img src="assets/main/asset-preview-2.png" alt="" />
+              <img src="assets/main/asset-preview-3.png" alt="" />
+            </div>
+          </div>
+          <button class="btn-black" id="viewAllAsset">
+            <span class="icon-grid"><span></span><span></span><span></span><span></span></span>
+            View All Asset
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RELATED PROJECTS -->
+    <section class="related-section">
+      <div class="related-head">
+        <h3>NEXT</h3>
+        <button class="show-all">Show all projects <img src="assets/common/icon-dropdown-black.svg" alt="" /></button>
+      </div>
+      <a class="related-card is-link" data-switch-page="video">
+        <img src="assets/main/related-1.png" alt="" />
+        <p class="cat">영상</p>
+        <p class="title">The-K 브랜딩 영상 제작</p>
+      </a>
+      <a class="related-card" href="#">
+        <img src="assets/main/related-2.png" alt="" />
+        <p class="cat">금융·보험</p>
+        <p class="title">The-K 마이크로 사이트 제작</p>
+      </a>
+      <button class="btn-black">View All Project</button>
+    </section>
+
+    <!-- CONTACT -->
+    <footer class="contact-section" data-section="contact">
+      <div>
+        <div class="talk-row">
+          <h2>Let&rsquo;s Talk</h2>
+          <img src="assets/common/icon-arrow-right-alt-lg.svg" alt="" />
+        </div>
+        <p class="email">hi@npley.com</p>
+        <p class="note">빠른 상담을 위해 프로젝트명, 기간, 예산을 알려주세요.</p>
+      </div>
+      <div>
+        <div class="contact-rows">
+          <div class="row"><span>Call</span><span>02 2088 1551</span></div>
+          <div class="row"><span>Fax</span><span>070 8228 1551</span></div>
+          <div class="row"><span>Com</span><span>서울시 서초구 사임당로 64, 교대벤처타워 6층 604호</span></div>
+        </div>
+        <img class="footer-logo" src="assets/common/logo-white.png" alt="NPLEY" />
+      </div>
+    </footer>
+
+  </main>
+
+  <main class="scroll-content page" data-page="video">
+
+    <!-- INTRO -->
+    <section class="intro" data-section="intro">
+      <div class="hero">
+        <img class="hero-img" src="assets/video/hero.png" alt="" />
+        <div class="hero-gradient"></div>
+        <div class="headline">
+          <p class="eyebrow">Branding Video Production</p>
+          <h1>The-K<br />브랜딩 영상 제작</h1>
+          <p class="sub">The-K 영상 제작</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- INFO + OVERVIEW + DETAIL + ASSET -->
+    <div class="con">
+      <div class="info-stack">
+
+        <div>
+          <p class="project-desc">프로젝트 관련 설명 최대 4줄 작성 가능합니다. 프로젝트 관련 설명 최대 4줄 작성 가능합니다. 프로젝트 관련 설명 최대 4줄 작성 가능합니다. 프로젝트 관련 설명 최대 4줄 작성 가능합니다. 프로젝트 관련 설명 최대 4줄 작성 가능합니다. 프로젝트 관련 설명 최대 4줄 작성 가능합니다. </p>
+          <div class="info-list">
+            <div class="row"><span>고객사</span><span>The-K</span></div>
+            <div class="row"><span>런칭일</span><span>2026년 00월</span></div>
+            <div class="row"><span>포지션</span><span>온오프라인 이벤트 프로모션</span></div>
+          </div>
+          <div class="site-link"><span>www.관련 사이트.kr</span><img src="assets/common/icon-link.svg" alt="" /></div>
+        </div>
+
+        <div class="section-block" data-section="overview">
+          <div class="section-title">
+            <h2>한눈에 보기</h2>
+            <span class="meta"><span>사진 24</span><b>·</b><span>영상 2</span></span>
+          </div>
+          <div class="filter-chips">
+            <button class="chip active">전체</button>
+            <button class="chip">시나리오</button>
+            <button class="chip">영상</button>
+          </div>
+          <div class="preview-grid">
+            <img class="tile-full" src="assets/video/preview-1.png" alt="" />
+            <div class="tile-row">
+              <img src="assets/video/preview-2.png" alt="" />
+              <img src="assets/video/preview-3.png" alt="" />
+            </div>
+            <div class="tile-row">
+              <img src="assets/video/preview-4.png" alt="" />
+              <img src="assets/video/preview-5.png" alt="" />
+            </div>
+          </div>
+          <button class="btn-black" id="viewAllVWork">
+            <span class="icon-grid"><span></span><span></span><span></span><span></span></span>
+            View All Work
+          </button>
+        </div>
+
+        <div class="section-block" data-section="detail">
+          <h2 style="margin:0 0 12px;font-weight:900;font-size:24px;letter-spacing:-0.48px;">상세 정보</h2>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div class="stat-grid">
+              <div class="stat"><span>제작 기간</span><strong>26.08 ~ 26.09</strong></div>
+              <div class="stat"><span>디자인 컨셉</span><strong>The-K 혜택마트</strong></div>
+            </div>
+            <div class="stat-grid">
+              <div class="stat"><span>제작 에셋 수</span><strong>32+</strong></div>
+              <div class="stat"><span>제작 작업물 수</span><strong>2</strong></div>
+            </div>
+            <div class="process-box">
+              <span>제작 프로세스</span>
+              <div class="timeline">
+                <img class="timeline-line" src="assets/common/icon-timeline.svg" alt="" />
+                <div class="step"><img class="dot" src="assets/common/icon-dot.svg" alt="" /><p>이벤트 기획<br />(약 0일)</p></div>
+                <div class="step"><img class="dot" src="assets/common/icon-dot.svg" alt="" /><p>컨셉 테스트<br />(약 0일)</p></div>
+                <div class="step"><img class="dot" src="assets/common/icon-dot.svg" alt="" /><p>디자인 진행<br />(약 0일)</p></div>
+                <div class="step"><img class="dot" src="assets/common/icon-dot.svg" alt="" /><p>개발 및 배포<br />(약 0일)</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-block" data-section="assetSection">
+          <div class="section-title">
+            <h2>제작 에셋</h2>
+            <span class="meta"><span>총 12</span></span>
+          </div>
+          <div class="filter-chips">
+            <button class="chip active">전체</button>
+            <button class="chip">캐릭터</button>
+            <button class="chip">배경</button>
+            <button class="chip">UI</button>
+            <button class="chip">아이콘</button>
+          </div>
+          <div class="preview-grid">
+            <img class="tile-full" src="assets/video/asset-preview-1.png" alt="" />
+            <div class="tile-row">
+              <img src="assets/video/asset-preview-2.png" alt="" />
+              <img src="assets/video/asset-preview-3.png" alt="" />
+            </div>
+          </div>
+          <button class="btn-black" id="viewAllVAsset">
+            <span class="icon-grid"><span></span><span></span><span></span><span></span></span>
+            View All Asset
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RELATED PROJECTS -->
+    <section class="related-section">
+      <div class="related-head">
+        <h3>NEXT</h3>
+        <button class="show-all">Show all projects <img src="assets/common/icon-dropdown-black.svg" alt="" /></button>
+      </div>
+      <a class="related-card" href="#">
+        <img src="assets/video/related-1.png" alt="" />
+        <p class="cat">금융·보험</p>
+        <p class="title">The-K 마이크로 사이트 제작</p>
+      </a>
+      <a class="related-card is-link" data-switch-page="main">
+        <img src="assets/video/related-2.png" alt="" />
+        <p class="cat">이벤트</p>
+        <p class="title">The-K 온오프라인 이벤트</p>
+      </a>
+      <button class="btn-black">View All Project</button>
+    </section>
+
+    <!-- CONTACT -->
+    <footer class="contact-section" data-section="contact">
+      <div>
+        <div class="talk-row">
+          <h2>Let&rsquo;s Talk</h2>
+          <img src="assets/common/icon-arrow-right-alt-lg.svg" alt="" />
+        </div>
+        <p class="email">hi@npley.com</p>
+        <p class="note">빠른 상담을 위해 프로젝트명, 기간, 예산을 알려주세요.</p>
+      </div>
+      <div>
+        <div class="contact-rows">
+          <div class="row"><span>Call</span><span>02 2088 1551</span></div>
+          <div class="row"><span>Fax</span><span>070 8228 1551</span></div>
+          <div class="row"><span>Com</span><span>서울시 서초구 사임당로 64, 교대벤처타워 6층 604호</span></div>
+        </div>
+        <img class="footer-logo" src="assets/common/logo-white.png" alt="NPLEY" />
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- ===== Gallery overlay (View All Work / View All Asset) ===== -->
+  <div class="gallery-overlay" id="galleryOverlay">
+    <div class="gallery-header">
+      <button class="gallery-back" id="galleryClose" aria-label="닫기"><img src="assets/common/icon-back.svg" alt="" /></button>
+      <div class="gallery-nav-info">
+        <div class="gallery-count"><span id="galleryCur">1</span><span>/</span><span id="galleryTotal">10</span></div>
+        <button class="gallery-filter">전체 <img src="assets/common/icon-dropdown-white.svg" alt="" /></button>
+      </div>
+    </div>
+    <div class="gallery-stage">
+      <div class="gallery-stage-inner">
+        <img id="galleryImage" class="gallery-img" src="" alt="" />
+        <div class="gallery-expand"><img src="assets/common/icon-play.svg" alt="" /></div>
+      </div>
+    </div>
+    <div class="gallery-controls">
+      <button class="nav-btn prev" id="galleryPrev" aria-label="이전"><img class="chevron" alt="" /></button>
+      <button class="nav-btn next" id="galleryNext" aria-label="다음"><img class="chevron" alt="" /></button>
+    </div>
+  </div>
+
+  <!-- ===== Landscape video full-view overlay ===== -->
+  <div class="fullview-overlay" id="fullviewOverlay">
+    <div class="fullview-stage" id="fullviewStage">
+      <img src="assets/gallery/vwork/fullview.png" alt="" />
+      <button class="fullview-back" id="fullviewClose" aria-label="닫기"><img src="assets/common/icon-back.svg" alt="" /></button>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+<script>
+(function(){
+  gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+  /* ---------- Header hide on scroll down / show on scroll up ---------- */
+  var header = document.getElementById('topHeader');
+  var lastY = window.scrollY;
+  var headerHidden = false;
+  var isAutoScrolling = false;
+
+  function setHeaderHidden(hide){
+    if(hide === headerHidden) return;
+    headerHidden = hide;
+    gsap.to(header, { y: hide ? -140 : 0, duration:.35, ease:'power2.out' });
+  }
+
+  /* ---------- Pages (main project / video project) ---------- */
+  var pages = {
+    main: document.querySelector('.page[data-page="main"]'),
+    video: document.querySelector('.page[data-page="video"]')
+  };
+  var currentPage = 'main';
+
+  function sectionsOfCurrentPage(){
+    var root = pages[currentPage];
+    return tabs.map(function(t){ return root.querySelector('[data-section="' + t.dataset.target + '"]'); });
+  }
+
+  /* ---------- Tab menu: click to fit-scroll to section ---------- */
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  var sections = [];
+
+  function setActiveTab(target){
+    tabs.forEach(function(t){ t.classList.toggle('active', t.dataset.target === target); });
+  }
+
+  // Recompute which tab should be active from the sections' actual current
+  // positions (instead of relying on enter/leave events, which can fire out
+  // of order for adjacent sections during a fast programmatic scroll).
+  function updateActiveTabFromScroll(){
+    var currentIdx = 0;
+    sections.forEach(function(el, i){
+      if(el && el.getBoundingClientRect().top <= 130){ currentIdx = i; }
+    });
+    setActiveTab(tabs[currentIdx].dataset.target);
+  }
+
+  function switchPage(target){
+    if(target === currentPage) return;
+    var fromEl = pages[currentPage];
+    var toEl = pages[target];
+
+    isAutoScrolling = true;
+    gsap.to(fromEl, {
+      opacity:0, duration:.25, ease:'power2.in',
+      onComplete:function(){
+        fromEl.classList.remove('is-active');
+        fromEl.style.opacity = '';
+        currentPage = target;
+        toEl.classList.add('is-active');
+        toEl.style.opacity = 0;
+        window.scrollTo(0, 0);
+        sections = sectionsOfCurrentPage();
+        setActiveTab('intro');
+        setHeaderHidden(false);
+        updateContactPillVisibility();
+        ScrollTrigger.refresh();
+        gsap.to(toEl, {
+          opacity:1, duration:.3, ease:'power2.out',
+          onComplete:function(){ lastY = 0; isAutoScrolling = false; }
+        });
+      }
+    });
+  }
+
+  document.querySelectorAll('[data-switch-page]').forEach(function(el){
+    el.addEventListener('click', function(){ switchPage(el.dataset.switchPage); });
+  });
+
+  document.getElementById('contactPill').addEventListener('click', function(){
+    var el = pages[currentPage].querySelector('[data-section="contact"]');
+    if(!el) return;
+    setHeaderHidden(false);
+    isAutoScrolling = true;
+    var top = el.getBoundingClientRect().top + window.scrollY;
+    gsap.to(window, {
+      duration:.8, scrollTo: top, ease:'power2.inOut',
+      onUpdate: updateActiveTabFromScroll,
+      onComplete:function(){ lastY = window.scrollY; isAutoScrolling = false; updateActiveTabFromScroll(); }
+    });
+  });
+
+  // The floating Contact pill would otherwise sit on top of the page's own
+  // Contact/footer section (covering the NPLEY logo there), so hide it once
+  // that section is reached — it's redundant at that point anyway.
+  var contactPillEl = document.getElementById('contactPill');
+  function updateContactPillVisibility(){
+    var contactEl = pages[currentPage].querySelector('[data-section="contact"]');
+    if(!contactEl) return;
+    var inView = contactEl.getBoundingClientRect().top < window.innerHeight * 0.85;
+    contactPillEl.style.pointerEvents = inView ? 'none' : 'auto';
+    gsap.to(contactPillEl, { opacity: inView ? 0 : 1, duration:.3, overwrite:true });
+  }
+
+  window.addEventListener('scroll', function(){
+    var y = window.scrollY;
+    updateActiveTabFromScroll();
+    updateContactPillVisibility();
+    if(isAutoScrolling){ lastY = y; return; }
+    if(Math.abs(y - lastY) < 4) return;
+    if(y > lastY && y > 80){ setHeaderHidden(true); }
+    else { setHeaderHidden(false); }
+    lastY = y;
+  }, { passive:true });
+
+  tabs.forEach(function(tab){
+    tab.addEventListener('click', function(){
+      var el = pages[currentPage].querySelector('[data-section="' + tab.dataset.target + '"]');
+      if(!el) return;
+      setActiveTab(tab.dataset.target);
+      setHeaderHidden(false);
+      isAutoScrolling = true;
+      var top = el.getBoundingClientRect().top + window.scrollY - 118;
+      gsap.to(window, {
+        duration:.8, scrollTo: top, ease:'power2.inOut',
+        onUpdate: updateActiveTabFromScroll,
+        onComplete:function(){ lastY = window.scrollY; isAutoScrolling = false; updateActiveTabFromScroll(); }
+      });
+    });
+  });
+
+  sections = sectionsOfCurrentPage();
+  updateActiveTabFromScroll();
+  updateContactPillVisibility();
+
+  /* ---------- Section reveal on scroll ---------- */
+  gsap.utils.toArray('.section-block, .related-card, .contact-section').forEach(function(el){
+    gsap.from(el, {
+      opacity:0, y:24, duration:.6, ease:'power2.out',
+      scrollTrigger:{ trigger: el, start:'top 92%' }
+    });
+  });
+
+  /* ---------- Gallery overlay ---------- */
+  var GALLERY_TYPES = {
+    work:   { total:10, folder:'work' },
+    asset:  { total:16, folder:'asset' },
+    vwork:  { total:11, folder:'vwork', expandIndexes:[0,1] }, // items 01,02 have a "view video fullscreen" affordance
+    vasset: { total:11, folder:'vasset' }
+  };
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function srcFor(type, index){
+    return 'assets/gallery/' + GALLERY_TYPES[type].folder + '/' + pad(index+1) + '.png';
+  }
+
+  var overlay = document.getElementById('galleryOverlay');
+  var galleryImage = document.getElementById('galleryImage');
+  var galleryCur = document.getElementById('galleryCur');
+  var galleryTotal = document.getElementById('galleryTotal');
+  var galleryExpand = document.querySelector('.gallery-expand');
+  var prevBtn = document.getElementById('galleryPrev');
+  var nextBtn = document.getElementById('galleryNext');
+  var prevIcon = prevBtn.querySelector('.chevron');
+  var nextIcon = nextBtn.querySelector('.chevron');
+  var MUTED_ICON = 'assets/common/icon-chevron-muted.svg';   // left-pointing, light fill
+  var ACTIVE_ICON = 'assets/common/icon-chevron-active.svg'; // right-pointing, dark fill
+
+  var state = { type:'work', index:0, total:GALLERY_TYPES.work.total, scrollY:0 };
+
+  function updateNavButtons(){
+    var hasPrev = state.index > 0;
+    var hasNext = state.index < state.total - 1;
+
+    prevBtn.classList.toggle('is-active', hasPrev);
+    prevBtn.classList.toggle('is-disabled', !hasPrev);
+    // prev points left: muted icon is already left-pointing; active icon (right-pointing) needs a flip
+    prevIcon.src = hasPrev ? ACTIVE_ICON : MUTED_ICON;
+    prevIcon.style.transform = hasPrev ? 'scaleX(-1)' : 'none';
+
+    nextBtn.classList.toggle('is-active', hasNext);
+    nextBtn.classList.toggle('is-disabled', !hasNext);
+    // next points right: active icon is already right-pointing; muted icon (left-pointing) needs a flip
+    nextIcon.src = hasNext ? ACTIVE_ICON : MUTED_ICON;
+    nextIcon.style.transform = hasNext ? 'none' : 'scaleX(-1)';
+  }
+
+  function renderSlide(animateDir){
+    galleryImage.src = srcFor(state.type, state.index);
+    galleryCur.textContent = state.index + 1;
+    galleryTotal.textContent = state.total;
+    updateNavButtons();
+    var expandIndexes = GALLERY_TYPES[state.type].expandIndexes;
+    var isExpand = !!(expandIndexes && expandIndexes.indexOf(state.index) !== -1);
+    galleryExpand.style.display = isExpand ? 'flex' : 'none';
+    galleryExpand.classList.toggle('is-expand', isExpand);
+    galleryExpand.querySelector('img').src = isExpand
+      ? 'assets/common/icon-expand.svg'
+      : 'assets/common/icon-play.svg';
+    if(animateDir){
+      gsap.fromTo(galleryImage,
+        { opacity:0, x: animateDir === 'next' ? 24 : -24 },
+        { opacity:1, x:0, duration:.35, ease:'power2.out' }
+      );
+    }
+  }
+
+  function openGallery(type, index){
+    state.type = type;
+    state.total = GALLERY_TYPES[type].total;
+    state.index = Math.max(0, Math.min(index || 0, state.total - 1));
+    state.scrollY = window.scrollY;
+
+    header.style.visibility = 'hidden';
+    document.getElementById('contactPill').style.visibility = 'hidden';
+    document.body.style.overflow = 'hidden';
+
+    renderSlide(null);
+
+    overlay.style.visibility = 'visible';
+    gsap.fromTo(overlay, { opacity:0, y:24 }, { opacity:1, y:0, duration:.4, ease:'power2.out' });
+  }
+
+  function closeGallery(){
+    gsap.to(overlay, {
+      opacity:0, y:24, duration:.3, ease:'power2.in',
+      onComplete:function(){
+        overlay.style.visibility = 'hidden';
+        header.style.visibility = 'visible';
+        document.getElementById('contactPill').style.visibility = 'visible';
+        document.body.style.overflow = '';
+        isAutoScrolling = true;
+        window.scrollTo(0, state.scrollY);
+        lastY = state.scrollY;
+        isAutoScrolling = false;
+      }
+    });
+  }
+
+  document.getElementById('viewAllWork').addEventListener('click', function(){ openGallery('work', 0); });
+  document.getElementById('viewAllAsset').addEventListener('click', function(){ openGallery('asset', 0); });
+  document.getElementById('viewAllVWork').addEventListener('click', function(){ openGallery('vwork', 0); });
+  document.getElementById('viewAllVAsset').addEventListener('click', function(){ openGallery('vasset', 0); });
+  document.getElementById('galleryClose').addEventListener('click', closeGallery);
+
+  /* ---------- Landscape video full-view (triggered from the gallery's expand button) ---------- */
+  var fullviewOverlay = document.getElementById('fullviewOverlay');
+  var fullviewStage = document.getElementById('fullviewStage');
+
+  function openFullview(){
+    fullviewOverlay.style.visibility = 'visible';
+    gsap.fromTo(fullviewStage, { scaleX:0.45, opacity:0 }, { scaleX:1, opacity:1, duration:.5, ease:'power3.out' });
+    gsap.to(fullviewOverlay, { opacity:1, duration:.3 });
+  }
+  function closeFullview(){
+    gsap.to(fullviewStage, { scaleX:0.45, opacity:0, duration:.35, ease:'power2.in' });
+    gsap.to(fullviewOverlay, {
+      opacity:0, duration:.35, delay:.05,
+      onComplete:function(){ fullviewOverlay.style.visibility = 'hidden'; }
+    });
+  }
+  galleryExpand.addEventListener('click', function(){
+    var expandIndexes = GALLERY_TYPES[state.type].expandIndexes;
+    if(expandIndexes && expandIndexes.indexOf(state.index) !== -1) openFullview();
+  });
+  document.getElementById('fullviewClose').addEventListener('click', closeFullview);
+
+  prevBtn.addEventListener('click', function(){
+    if(state.index === 0) return;
+    state.index -= 1;
+    renderSlide('prev');
+  });
+  nextBtn.addEventListener('click', function(){
+    if(state.index === state.total - 1) return;
+    state.index += 1;
+    renderSlide('next');
+  });
+
+  document.addEventListener('keydown', function(e){
+    if(overlay.style.visibility !== 'visible') return;
+    if(e.key === 'ArrowLeft') prevBtn.click();
+    if(e.key === 'ArrowRight') nextBtn.click();
+    if(e.key === 'Escape') closeGallery();
+  });
+
+  /* ---------- Overview filter chips (전체/온라인/오프라인): swap preview grid content ---------- */
+  var overviewChips = document.getElementById('overviewChips');
+  if(overviewChips){
+    var overviewPanels = document.querySelectorAll('#overviewGrid [data-panel]');
+    overviewChips.querySelectorAll('.chip').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var key = btn.dataset.filter;
+        overviewPanels.forEach(function(p){
+          if(p.dataset.panel === key){
+            p.style.display = 'flex';
+            gsap.fromTo(p, { opacity:0, y:8 }, { opacity:1, y:0, duration:.35, ease:'power2.out' });
+          } else {
+            p.style.display = 'none';
+          }
+        });
+      });
+    });
+  }
+
+  /* ---------- Decorative filter chips (visual toggle only) ---------- */
+  document.querySelectorAll('.filter-chips').forEach(function(group){
+    group.querySelectorAll('.chip').forEach(function(chip){
+      chip.addEventListener('click', function(){
+        group.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('active'); });
+        chip.classList.add('active');
+      });
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
